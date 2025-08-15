@@ -34,13 +34,16 @@ const Payment = ({ player }) => {
       setLoading(true);
       setError('');
       setSuccess('');
-      const res = await axios.post('/api/deposit', { amount: amt });
+      const res = await axios.post('/api/deposit', { 
+        amount: amt,
+        playerId: player.id 
+      });
+      
       if (res.data.url) {
-        // redirect user to Stripe checkout
+        // Redirect user to Stripe checkout
         window.location.href = res.data.url;
       } else {
-        setSuccess('Deposit successful');
-        fetchBalance();
+        setError('No checkout URL received');
       }
     } catch (err) {
       setError(err?.response?.data?.message || 'Deposit failed');
