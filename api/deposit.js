@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import gameDB from '../../lib/db.js';
+import gameDB from '../lib/db.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

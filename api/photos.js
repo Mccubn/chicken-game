@@ -1,4 +1,4 @@
-import gameDB from '../../lib/db.js';
+import gameDB from '../lib/db.js';
 
 export default function handler(req, res) {
   if (req.method === 'GET') {

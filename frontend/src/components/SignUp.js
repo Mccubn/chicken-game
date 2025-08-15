@@ -15,10 +15,17 @@ const SignUp = ({ onSignedUp }) => {
     try {
       setLoading(true);
       setError('');
+      console.log('Attempting to join with name:', name);
+      console.log('API endpoint:', '/api/join');
+      
       const res = await axios.post('/api/join', { name });
+      console.log('Join successful:', res.data);
       onSignedUp(res.data);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to join');
+      console.error('Join error details:', err);
+      console.error('Error response:', err?.response);
+      console.error('Error message:', err?.message);
+      setError(err?.response?.data?.message || err?.message || 'Failed to join');
     } finally {
       setLoading(false);
     }
