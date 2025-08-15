@@ -92,6 +92,52 @@ const Payment = ({ player }) => {
         }}>
           Team balance for shared expenses
         </p>
+        
+        {/* Manual Balance Update */}
+        <div style={{ 
+          marginTop: '1rem',
+          padding: '1rem',
+          background: 'rgba(255,255,255,0.5)',
+          borderRadius: '8px',
+          border: '1px solid #bbf7d0'
+        }}>
+          <h4 style={{ 
+            margin: '0 0 0.5rem 0', 
+            fontSize: '1rem',
+            color: 'var(--text-primary)'
+          }}>
+            🔄 Manual Update
+          </h4>
+          <p style={{ 
+            margin: '0 0 0.75rem 0', 
+            fontSize: '0.8rem',
+            color: 'var(--text-secondary)'
+          }}>
+            After paying via Stripe, manually update the balance here
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Amount paid"
+              className="input"
+              style={{ flex: 1, margin: 0, fontSize: '0.8rem', padding: '0.5rem' }}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <button 
+              onClick={handleDeposit}
+              disabled={loading || !amount}
+              className="btn"
+              style={{ 
+                fontSize: '0.8rem',
+                padding: '0.5rem 1rem',
+                background: 'linear-gradient(135deg, var(--accent), #0891b2)'
+              }}
+            >
+              Update
+            </button>
+          </div>
+        </div>
       </div>
       
       <form onSubmit={handleDeposit}>
@@ -116,21 +162,38 @@ const Payment = ({ player }) => {
           />
         </div>
         
-        <button 
-          type="submit" 
-          disabled={loading} 
-          className="btn"
-          style={{ 
-            width: '100%',
-            background: 'linear-gradient(135deg, var(--success), #059669)'
-          }}
-        >
-          {loading ? (
-            <span className="loading-dots">Processing</span>
-          ) : (
-            '💳 Add to Tab'
-          )}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="btn"
+            style={{ 
+              flex: 1,
+              background: 'linear-gradient(135deg, var(--success), #059669)'
+            }}
+          >
+            {loading ? (
+              <span className="loading-dots">Processing</span>
+            ) : (
+              '💳 Add to Tab'
+            )}
+          </button>
+          
+          <a 
+            href="https://buy.stripe.com/fZucN7c9UfHR8wL45P1VK00"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn"
+            style={{ 
+              flex: 1,
+              background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+              textDecoration: 'none',
+              textAlign: 'center'
+            }}
+          >
+            🚀 Quick Pay
+          </a>
+        </div>
       </form>
       
       {error && (
