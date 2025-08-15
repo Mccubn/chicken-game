@@ -50,8 +50,21 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
     }
   };
 
-  if (loadError) return <p>Map cannot be loaded</p>;
-  if (!isLoaded) return <p>Loading map...</p>;
+  if (loadError) return (
+    <div className="card" style={{ textAlign: 'center', margin: '2rem' }}>
+      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🗺️</div>
+      <h3 style={{ color: 'var(--error)', marginBottom: '0.5rem' }}>Map Error</h3>
+      <p style={{ color: 'var(--text-secondary)' }}>Unable to load the game map</p>
+    </div>
+  );
+  
+  if (!isLoaded) return (
+    <div className="card" style={{ textAlign: 'center', margin: '2rem' }}>
+      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌍</div>
+      <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Loading Map</h3>
+      <div className="loading-dots" style={{ color: 'var(--text-secondary)' }}>Initializing</div>
+    </div>
+  );
 
   return (
     <div style={{ position: 'relative', height: '100%' }}>
@@ -87,9 +100,65 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
         ))}
       </GoogleMap>
       {role !== 'chicken' && selectedBar && (
-        <div style={{ position: 'absolute', bottom: 10, left: 10, background: '#fff', padding: '0.5rem', borderRadius: 4 }}>
-          <p>Upload a drink photo for {selectedBar.name}:</p>
-          <input type="file" accept="image/*" onChange={handlePhotoUpload} />
+        <div className="card" style={{ 
+          position: 'absolute', 
+          bottom: '1rem', 
+          left: '1rem', 
+          maxWidth: '300px',
+          boxShadow: 'var(--shadow-xl)'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem',
+            marginBottom: '1rem'
+          }}>
+            <div style={{ 
+              background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+              borderRadius: '50%',
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '1rem'
+            }}>
+              📸
+            </div>
+            <div>
+              <h4 style={{ 
+                margin: 0, 
+                color: 'var(--text-primary)', 
+                fontSize: '1rem',
+                fontWeight: '600'
+              }}>
+                {selectedBar.name}
+              </h4>
+              <p style={{ 
+                margin: 0, 
+                color: 'var(--text-secondary)', 
+                fontSize: '0.75rem' 
+              }}>
+                Upload drink photo
+              </p>
+            </div>
+          </div>
+          
+          <label className="btn btn-secondary" style={{ 
+            width: '100%', 
+            textAlign: 'center',
+            cursor: 'pointer',
+            display: 'block'
+          }}>
+            📁 Choose Photo
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handlePhotoUpload} 
+              style={{ display: 'none' }}
+            />
+          </label>
         </div>
       )}
     </div>

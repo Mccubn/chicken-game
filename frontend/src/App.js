@@ -17,18 +17,23 @@ const App = () => {
   }, [player]);
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          player ? <Navigate to="/game" replace /> : <SignUp onSignedUp={setPlayer} />
-        }
-      />
-      <Route
-        path="/game"
-        element={player ? <GamePage player={player} /> : <Navigate to="/" replace />}
-      />
-    </Routes>
+    <div style={{ 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+    }}>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            player ? <Navigate to="/game" replace /> : <SignUp onSignedUp={setPlayer} />
+          }
+        />
+        <Route
+          path="/game"
+          element={player ? <GamePage player={player} /> : <Navigate to="/" replace />}
+        />
+      </Routes>
+    </div>
   );
 };
 

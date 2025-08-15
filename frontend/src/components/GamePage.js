@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import GameMap from './GameMap';
 import Chat from './Chat';
 import Payment from './Payment';
+import Profile from './Profile';
+import TabBar from './TabBar';
 
 const GamePage = ({ player }) => {
   const [players, setPlayers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [role, setRole] = useState(player.role);
+  const [activeTab, setActiveTab] = useState('map');
 
   // Fetch initial data
   useEffect(() => {
@@ -90,22 +93,78 @@ const GamePage = ({ player }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <header style={{ padding: '1rem', background: '#f5f5f5', display: 'flex', justifyContent: 'space-between' }}>
-        <div>
-          Logged in as <strong>{player.name}</strong>
-          {role === 'chicken' && <span style={{ marginLeft: 8, color: 'orange' }}>(Chicken)</span>}
+      <header className="header" style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ 
+            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: '1.2rem'
+          }}>
+            {player.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+              {player.name}
+            </div>
+            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+              {role === 'chicken' ? '🐔 Chicken Hunter' : '👤 Player'}
+            </div>
+          </div>
         </div>
-        <button onClick={markFound} style={{ padding: '0.5rem 1rem' }}>Found Chicken</button>
+        
+        <button 
+          onClick={markFound} 
+          className="btn"
+          style={{ 
+            background: 'linear-gradient(135deg, var(--success), #059669)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          🎯 Found Chicken
+        </button>
       </header>
-      <div style={{ flex: 1, display: 'flex' }}>
-        <div style={{ flex: 2, minHeight: 0 }}>
-          <GameMap photos={photos} role={role} uploadPhoto={uploadPhoto} />
-        </div>
-        <div style={{ flex: 1, borderLeft: '1px solid #ccc', display: 'flex', flexDirection: 'column' }}>
-          <Chat messages={messages} sendMessage={sendMessage} />
-          <Payment player={player} />
-        </div>
+      
+      <div style={{ 
+        flex: 1, 
+        display: 'flex', 
+        background: 'var(--surface-hover)',
+        paddingBottom: '80px' // Space for tab bar
+      }}>
+        {activeTab === 'map' && (
+          <div style={{ flex: 1, minHeight: 0, padding: '1rem' }}>
+            <GameMap photos={photos} role={role} uploadPhoto={uploadPhoto} />
+          </div>
+        )}
+        
+        {activeTab === 'chat' && (
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <Chat messages={messages} sendMessage={sendMessage} />
+          </div>
+        )}
+        
+        {activeTab === 'payment' && (
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <Payment player={player} />
+          </div>
+        )}
+        
+        {activeTab === 'profile' && (
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <Profile player={player} role={role} players={players} />
+          </div>
+        )}
       </div>
+      
+      <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };

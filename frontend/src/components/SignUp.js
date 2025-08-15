@@ -25,23 +25,71 @@ const SignUp = ({ onSignedUp }) => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '2rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: 8 }}>
-      <h2>Join Chicken Game</h2>
+    <div className="card tech-border" style={{ maxWidth: 500, margin: '4rem auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <h1 className="gradient-text" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+          🐔 Chicken Game
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+          Join the ultimate chicken hunting adventure
+        </p>
+      </div>
+      
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+            Player Name
+          </label>
           <input
             type="text"
-            placeholder="Your name"
+            placeholder="Enter your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ width: '100%', padding: '0.5rem' }}
+            className="input"
+            autoFocus
           />
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ padding: '0.5rem 1rem' }}>
-          {loading ? 'Joining...' : 'Join'}
+        
+        {error && (
+          <div style={{ 
+            background: 'linear-gradient(135deg, #fef2f2, #fee2e2)', 
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            padding: '0.75rem',
+            marginBottom: '1.5rem',
+            color: 'var(--error)',
+            fontSize: '0.875rem'
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
+        
+        <button 
+          type="submit" 
+          disabled={loading} 
+          className="btn"
+          style={{ width: '100%', fontSize: '1rem', padding: '1rem' }}
+        >
+          {loading ? (
+            <span className="loading-dots">Joining</span>
+          ) : (
+            '🚀 Join Game'
+          )}
         </button>
       </form>
+      
+      <div style={{ 
+        textAlign: 'center', 
+        marginTop: '2rem', 
+        padding: '1rem',
+        background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)',
+        borderRadius: '12px',
+        border: '1px solid #bae6fd'
+      }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', margin: 0 }}>
+          🎮 Real-time multiplayer • 📱 Cross-platform • 🏆 Leaderboards
+        </p>
+      </div>
     </div>
   );
 };
