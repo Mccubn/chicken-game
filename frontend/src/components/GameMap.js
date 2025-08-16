@@ -20,7 +20,7 @@ const containerStyle = {
 const GameMap = ({ photos, role, uploadPhoto }) => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY',
-    libraries: ['places'],
+    libraries: ['places', 'geometry'],
   });
   
   const [map, setMap] = useState(null);
@@ -54,7 +54,8 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
 
       service.nearbySearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          const barData = results.slice(0, 10).map(place => {
+          const polygon = new window.google.maps.Polygon({ paths: areaCoords });
+          const barData = results.slice(0, 20).map(place => {
             const loc = place.geometry?.location;
             const position = loc && typeof loc.lat === 'function' 
               ? { lat: loc.lat(), lng: loc.lng() } 
@@ -68,6 +69,13 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
               openNow: place.opening_hours?.open_now,
               photos: place.photos
             };
+          }).filter(bar => {
+            try {
+              const point = new window.google.maps.LatLng(bar.position.lat, bar.position.lng);
+              return window.google.maps.geometry.poly.containsLocation(point, polygon);
+            } catch (_) {
+              return true;
+            }
           });
           setBars(barData);
         } else {
