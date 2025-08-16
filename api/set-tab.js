@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     
     res.status(200).json({ 
       message: 'Tab total updated successfully',
-      balance: gameDB.getBalance()
+      balance: await blobGameDB.getBalance()
     });
     
   } catch (error) {
