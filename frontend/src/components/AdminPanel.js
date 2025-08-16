@@ -42,12 +42,14 @@ const AdminPanel = ({ admin, onLogout }) => {
 
     setLoading(true);
     try {
-      await axios.post('/api/set-tab', { amount: parseFloat(newTabAmount) });
-      setTabTotal(parseFloat(newTabAmount));
+      const response = await axios.post('/api/set-tab', { amount: parseFloat(newTabAmount) });
+      // Update local state with the response from server
+      setTabTotal(response.data.balance);
       setNewTabAmount('');
       setMessage('Tab total updated successfully!');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
+      console.error('Error updating tab total:', error);
       setMessage('Error updating tab total');
     } finally {
       setLoading(false);
