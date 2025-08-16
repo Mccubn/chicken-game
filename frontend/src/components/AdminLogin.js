@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminLogin = ({ onAdminLogin }) => {
   const [adminName, setAdminName] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -79,6 +81,21 @@ const AdminLogin = ({ onAdminLogin }) => {
           🔑 Admin: GameAdmin-Nick • 🎮 Game Controls • 💰 Tab Management
         </p>
       </div>
+
+      <button 
+        type="button"
+        onClick={() => navigate('/')}
+        className="btn btn-secondary"
+        style={{ 
+          width: '100%', 
+          marginTop: '1rem',
+          background: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
+          color: 'var(--primary)'
+        }}
+      >
+        ⬅️ Back to Player Login
+      </button>
     </div>
   );
 };
