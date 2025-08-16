@@ -54,15 +54,21 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
 
       service.nearbySearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          const barData = results.slice(0, 10).map(place => ({
-            id: place.place_id,
-            name: place.name,
-            position: place.geometry.location,
-            rating: place.rating,
-            address: place.vicinity,
-            openNow: place.opening_hours?.open_now,
-            photos: place.photos
-          }));
+          const barData = results.slice(0, 10).map(place => {
+            const loc = place.geometry?.location;
+            const position = loc && typeof loc.lat === 'function' 
+              ? { lat: loc.lat(), lng: loc.lng() } 
+              : { lat: DEFAULT_CENTER.lat, lng: DEFAULT_CENTER.lng };
+            return {
+              id: place.place_id,
+              name: place.name,
+              position,
+              rating: place.rating,
+              address: place.vicinity,
+              openNow: place.opening_hours?.open_now,
+              photos: place.photos
+            };
+          });
           setBars(barData);
         } else {
           console.error('Places API error:', status);
@@ -267,7 +273,7 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
           <Marker
             key={idx}
             position={bar.position}
-            label={bar.name}
+            title={bar.name}
             onClick={() => handleBarClick(bar)}
           />
         ))}
