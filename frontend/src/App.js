@@ -2,11 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import SignUp from './components/SignUp';
 import GamePage from './components/GamePage';
+import AdminLogin from './components/AdminLogin';
+import AdminPanel from './components/AdminPanel';
 
 // Simple wrapper to persist player info in localStorage
 const App = () => {
   const [player, setPlayer] = useState(() => {
     const stored = localStorage.getItem('player');
+    return stored ? JSON.parse(stored) : null;
+  });
+  
+  const [admin, setAdmin] = useState(() => {
+    const stored = localStorage.getItem('admin');
     return stored ? JSON.parse(stored) : null;
   });
 
@@ -15,6 +22,12 @@ const App = () => {
       localStorage.setItem('player', JSON.stringify(player));
     }
   }, [player]);
+
+  useEffect(() => {
+    if (admin) {
+      localStorage.setItem('admin', JSON.stringify(admin));
+    }
+  }, [admin]);
 
   return (
     <div style={{ 
@@ -25,7 +38,16 @@ const App = () => {
         <Route
           path="/"
           element={
-            player ? <Navigate to="/game" replace /> : <SignUp onSignedUp={setPlayer} />
+            admin ? <Navigate to="/admin" replace /> :
+            player ? <Navigate to="/game" replace /> : 
+            <SignUp onSignedUp={setPlayer} />
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            admin ? <AdminPanel admin={admin} onLogout={() => setAdmin(null)} /> :
+            <AdminLogin onAdminLogin={setAdmin} />
           }
         />
         <Route

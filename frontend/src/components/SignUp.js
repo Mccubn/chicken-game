@@ -97,6 +97,36 @@ const SignUp = ({ onSignedUp }) => {
           🎮 Real-time multiplayer • 📱 Cross-platform • 🏆 Leaderboards
         </p>
       </div>
+      
+      <div style={{ 
+        textAlign: 'center', 
+        marginTop: '1rem',
+        padding: '1rem',
+        background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+        borderRadius: '12px',
+        border: '1px solid #fcd34d'
+      }}>
+        <p style={{ 
+          margin: '0 0 0.5rem 0', 
+          color: 'var(--text-secondary)', 
+          fontSize: '0.875rem' 
+        }}>
+          🔐 Admin Access
+        </p>
+        <button 
+          onClick={() => window.location.href = '/admin'}
+          className="btn btn-secondary"
+          style={{ 
+            fontSize: '0.875rem',
+            padding: '0.5rem 1rem',
+            background: 'rgba(59, 130, 246, 0.1)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            color: 'var(--primary)'
+          }}
+        >
+          🚪 Admin Panel
+        </button>
+      </div>
     </div>
   );
 };

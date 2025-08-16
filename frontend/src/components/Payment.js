@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Payment = ({ player }) => {
   const [balance, setBalance] = useState(0);
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [expenseDescription, setExpenseDescription] = useState('');
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -16,9 +21,60 @@ const Payment = ({ player }) => {
 
   useEffect(() => {
     fetchBalance();
-    const interval = setInterval(fetchBalance, 10000);
+    fetchExpenses();
+    const interval = setInterval(() => {
+      fetchBalance();
+      fetchExpenses();
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const res = await axios.get('/api/expenses');
+      setExpenses(res.data);
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    }
+  };
+
+  const addExpense = async (e) => {
+    e.preventDefault();
+    if (!expenseAmount || expenseAmount <= 0 || !expenseDescription.trim()) {
+      setError('Please enter both amount and description');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.post('/api/expenses', {
+        amount: parseFloat(expenseAmount),
+        description: expenseDescription.trim(),
+        playerName: player.name
+      });
+      
+      // Update local state
+      const newExpense = {
+        id: Date.now(),
+        amount: parseFloat(expenseAmount),
+        description: expenseDescription.trim(),
+        playerName: player.name,
+        timestamp: new Date().toISOString()
+      };
+      
+      setExpenses(prev => [newExpense, ...prev]);
+      setBalance(prev => prev - parseFloat(expenseAmount));
+      
+      setExpenseAmount('');
+      setExpenseDescription('');
+      setSuccess('Expense added successfully!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      setError('Error adding expense');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -66,29 +122,115 @@ const Payment = ({ player }) => {
 
       </div>
       
-      <div style={{ textAlign: 'center' }}>
-        <a 
-          href="https://buy.stripe.com/fZucN7c9UfHR8wL45P1VK00"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn"
-          style={{ 
-            fontSize: '1.1rem',
-            padding: '1rem 2rem',
-            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-            textDecoration: 'none',
-            display: 'inline-block'
-          }}
-        >
-          🚀 Pay & Add to Tab
-        </a>
-        <p style={{ 
-          margin: '1rem 0 0 0', 
-          color: 'var(--text-secondary)', 
-          fontSize: '0.875rem' 
+      {/* Expense Tracking */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h3 style={{ 
+          margin: '0 0 1rem 0', 
+          color: 'var(--text-primary)',
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
         }}>
-          Click above to pay through Stripe. Your balance will update automatically!
-        </p>
+          📝 Add Expense
+        </h3>
+        
+        <form onSubmit={addExpense}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '1rem',
+            marginBottom: '1rem'
+          }}>
+            <input
+              type="number"
+              step="0.01"
+              value={expenseAmount}
+              onChange={(e) => setExpenseAmount(e.target.value)}
+              placeholder="Amount spent"
+              className="input"
+            />
+            <input
+              type="text"
+              value={expenseDescription}
+              onChange={(e) => setExpenseDescription(e.target.value)}
+              placeholder="What was purchased?"
+              className="input"
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            disabled={loading || !expenseAmount || !expenseDescription.trim()}
+            className="btn"
+            style={{ 
+              width: '100%',
+              background: 'linear-gradient(135deg, var(--warning), #d97706)'
+            }}
+          >
+            {loading ? 'Adding...' : '📝 Add Expense'}
+          </button>
+        </form>
+      </div>
+
+      {/* Recent Expenses */}
+      <div>
+        <h3 style={{ 
+          margin: '0 0 1rem 0', 
+          color: 'var(--text-primary)',
+          fontSize: '1.25rem',
+          fontWeight: '600',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          📋 Recent Expenses
+        </h3>
+        
+        {expenses.length === 0 ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '2rem',
+            color: 'var(--text-muted)',
+            fontStyle: 'italic',
+            background: 'var(--surface-hover)',
+            borderRadius: '12px'
+          }}>
+            No expenses recorded yet
+          </div>
+        ) : (
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {expenses.slice(0, 10).map((expense) => (
+              <div key={expense.id} style={{ 
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '1rem',
+                borderBottom: '1px solid var(--border)',
+                background: 'var(--surface-hover)',
+                marginBottom: '0.5rem',
+                borderRadius: '8px'
+              }}>
+                <div>
+                  <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                    {expense.description}
+                  </div>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                    by {expense.playerName} • {new Date(expense.timestamp).toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ 
+                  fontSize: '1.25rem', 
+                  fontWeight: '700', 
+                  color: 'var(--error)' 
+                }}>
+                  -${expense.amount.toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       
       {error && (
