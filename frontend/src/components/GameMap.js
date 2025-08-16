@@ -81,24 +81,30 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
     }
   }, [map]);
 
-  // Get user's current location
+  // Get user's current location (returns a Promise)
   const getUserLocation = useCallback(() => {
-    if (navigator.geolocation) {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        const err = new Error('Geolocation is not supported by this browser');
+        console.error(err);
+        reject(err);
+        return;
+      }
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           };
           setUserLocation(location);
-          return location;
+          resolve(location);
         },
         (error) => {
           console.error('Error getting location:', error);
-          return null;
+          reject(error);
         }
       );
-    }
+    });
   }, []);
 
   // Get directions to selected bar
@@ -118,6 +124,13 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
       directionsService.route(request, (result, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
           setDirections(result);
+          try {
+            if (map && result?.routes?.[0]?.bounds) {
+              map.fitBounds(result.routes[0].bounds);
+            }
+          } catch (e) {
+            // ignore fitBounds errors
+          }
         } else {
           console.error('Directions error:', status);
         }
@@ -129,22 +142,38 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
     }
   }, [userLocation]);
 
-  const handleBarClick = (bar) => {
+  const handleBarClick = async (bar) => {
     setSelectedBar(bar);
     // Clear previous directions
     setDirections(null);
     
     // Get user location and directions if not already set
-    if (!userLocation) {
-      getUserLocation().then(location => {
-        if (location) {
-          getDirections(bar.position);
-        }
-      });
-    } else {
-      getDirections(bar.position);
+    try {
+      let origin = userLocation;
+      if (!origin) {
+        origin = await getUserLocation();
+      }
+      if (origin) {
+        getDirections(bar.position);
+      }
+    } catch (_) {
+      // silently ignore if user denies permission
     }
   };
+
+  const openExternalDirections = useCallback(async (destination) => {
+    try {
+      let origin = userLocation;
+      if (!origin) {
+        origin = await getUserLocation();
+      }
+      if (!origin) return;
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=walking`;
+      window.open(url, '_blank');
+    } catch (_) {
+      // ignore
+    }
+  }, [userLocation, getUserLocation]);
 
   const handlePhotoUpload = (e) => {
     if (!selectedBar) return;
@@ -201,7 +230,11 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
         
         <button 
           className="btn btn-secondary"
-          onClick={getUserLocation}
+          onClick={async () => {
+            try {
+              await getUserLocation();
+            } catch (_) {}
+          }}
           style={{ 
             fontSize: '0.8rem',
             padding: '0.5rem 1rem',
@@ -393,7 +426,17 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
             
             <button 
               className="btn"
-              onClick={() => getUserLocation()}
+              disabled={loadingDirections}
+              onClick={async () => {
+                try {
+                  if (!userLocation) {
+                    await getUserLocation();
+                  }
+                  if (selectedBar?.position) {
+                    getDirections(selectedBar.position);
+                  }
+                } catch (_) {}
+              }}
               style={{ 
                 flex: 1,
                 fontSize: '0.8rem',
@@ -401,7 +444,19 @@ const GameMap = ({ photos, role, uploadPhoto }) => {
                 background: 'linear-gradient(135deg, var(--success), #059669)'
               }}
             >
-              📍 Get Location
+              {loadingDirections ? '⏳ Getting Directions...' : '🧭 Directions'}
+            </button>
+
+            <button 
+              className="btn btn-secondary"
+              onClick={() => selectedBar?.position && openExternalDirections(selectedBar.position)}
+              style={{ 
+                flex: 1,
+                fontSize: '0.8rem',
+                padding: '0.5rem'
+              }}
+            >
+              🌐 Open in Maps
             </button>
           </div>
         </div>
