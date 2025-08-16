@@ -1,9 +1,9 @@
-import gameDB from '../lib/db.js';
+import blobGameDB from '../lib/blob-db.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
-      const photos = gameDB.getAllPhotos();
+      const photos = await blobGameDB.getAllPhotos();
       res.status(200).json(photos);
     } catch (error) {
       console.error('Photos GET error:', error);
@@ -31,7 +31,7 @@ export default function handler(req, res) {
         uploadedAt: new Date().toISOString()
       };
       
-      gameDB.addPhoto(photo);
+      await blobGameDB.addPhoto(photo);
       res.status(200).json({ success: true, photo });
       
     } catch (error) {

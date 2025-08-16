@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import gameDB from '../lib/db.js';
+import blobGameDB from '../lib/blob-db.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         const amount = session.amount_total / 100; // Convert from cents to dollars
         
         // Update the game balance
-        const newBalance = gameDB.updateBalance(amount);
+        const newBalance = await blobGameDB.updateBalance(amount);
         
         console.log(`Payment successful: $${amount} added to game balance. New balance: $${newBalance}`);
         
