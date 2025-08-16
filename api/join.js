@@ -1,6 +1,6 @@
-import gameDB from '../lib/db.js';
+import blobGameDB from '../lib/blob-db.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -35,8 +35,8 @@ export default function handler(req, res) {
       joinedAt: new Date().toISOString()
     };
     
-    gameDB.addPlayer(player);
-    gameDB.assignChickens();
+    await blobGameDB.addPlayer(player);
+    await blobGameDB.assignChickens();
     
     console.log('Player joined successfully:', player);
     

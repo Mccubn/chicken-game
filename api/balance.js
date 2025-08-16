@@ -1,12 +1,12 @@
-import gameDB from '../lib/db.js';
+import blobGameDB from '../lib/blob-db.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    const balance = gameDB.getBalance();
+    const balance = await blobGameDB.getBalance();
     res.status(200).json({ balance });
     
   } catch (error) {
