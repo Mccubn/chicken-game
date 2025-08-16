@@ -6,10 +6,10 @@ const DEFAULT_CENTER = { lat: 39.7095, lng: -104.9880 };
 
 // Define play area boundary polygon (approx rectangular area)
 const areaCoords = [
-  { lat: 39.7140, lng: -104.9905 },
-  { lat: 39.7140, lng: -104.9840 },
-  { lat: 39.7060, lng: -104.9840 },
-  { lat: 39.7060, lng: -104.9905 },
+  { lat: 39.711197, lng: -104.992385 },
+  { lat: 39.711113, lng: -104.982785},
+  { lat: 39.718306, lng: -104.982665},
+  { lat: 39.718385, lng: -104.989211}
 ];
 
 const containerStyle = {
