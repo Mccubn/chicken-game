@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import GameMap from './GameMap';
-import Chat from './Chat';
 import Payment from './Payment';
 import Profile from './Profile';
 import TabBar from './TabBar';
 
 const GamePage = ({ player }) => {
   const [players, setPlayers] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [role, setRole] = useState(player.role);
   const [activeTab, setActiveTab] = useState('map');
@@ -52,18 +50,6 @@ const GamePage = ({ player }) => {
     }
   };
 
-  const sendMessage = (text) => {
-    if (text.trim()) {
-      const newMessage = {
-        id: Date.now(),
-        text,
-        player: player.name,
-        timestamp: new Date().toISOString()
-      };
-      setMessages(prev => [...prev, newMessage]);
-    }
-  };
-
   const uploadPhoto = async (formData) => {
     try {
       const response = await fetch('/api/photos', {
@@ -80,16 +66,7 @@ const GamePage = ({ player }) => {
     }
   };
 
-  const markFound = () => {
-    // Add a system message when chicken is found
-    const foundMessage = {
-      id: Date.now(),
-      system: true,
-      text: `${player.name} found a chicken!`,
-      timestamp: new Date().toISOString()
-    };
-    setMessages(prev => [...prev, foundMessage]);
-  };
+  // Chat removed in this iteration
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -119,18 +96,7 @@ const GamePage = ({ player }) => {
           </div>
         </div>
         
-        <button 
-          onClick={markFound} 
-          className="btn"
-          style={{ 
-            background: 'linear-gradient(135deg, var(--success), #059669)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}
-        >
-          🎯 Found Chicken
-        </button>
+        {/* Chat-related action removed */}
       </header>
       
       <div style={{ 
@@ -145,11 +111,7 @@ const GamePage = ({ player }) => {
           </div>
         )}
         
-        {activeTab === 'chat' && (
-          <div style={{ flex: 1, minHeight: 0 }}>
-            <Chat messages={messages} sendMessage={sendMessage} />
-          </div>
-        )}
+        {/* Chat tab removed */}
         
         {activeTab === 'payment' && (
           <div style={{ flex: 1, minHeight: 0 }}>

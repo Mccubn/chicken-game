@@ -9,12 +9,6 @@ const TabBar = ({ activeTab, onTabChange }) => {
       description: 'Game Area'
     },
     {
-      id: 'chat',
-      label: 'Chat',
-      icon: '💬',
-      description: 'Team Chat'
-    },
-    {
       id: 'payment',
       label: 'Payment',
       icon: '💰',
