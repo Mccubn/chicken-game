@@ -113,6 +113,22 @@ const AdminPanel = ({ admin, onLogout }) => {
     }
   };
 
+  const announceChickens = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.post('/api/choose-chickens');
+      const ann = res.data?.announcement;
+      if (ann?.message) {
+        setMessage(ann.message);
+        setTimeout(() => setMessage(''), 5000);
+      }
+    } catch (error) {
+      setMessage('Error choosing chickens');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ 
       padding: '2rem',
@@ -389,6 +405,18 @@ const AdminPanel = ({ admin, onLogout }) => {
             {loading ? 'Resetting...' : '🔄 Reset Game'}
           </button>
           
+          <button 
+            onClick={announceChickens}
+            disabled={loading}
+            className="btn"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--warning), #d97706)',
+              padding: '1rem 2rem'
+            }}
+          >
+            {loading ? 'Choosing…' : '🐔 Choose Chickens'}
+          </button>
+
           <button 
             onClick={() => window.location.reload()}
             className="btn btn-secondary"

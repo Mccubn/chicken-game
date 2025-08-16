@@ -1,6 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Profile = ({ player, role, players }) => {
+  const [partnerId, setPartnerId] = useState('');
+  const [teams, setTeams] = useState([]);
+  const [announcement, setAnnouncement] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const t = await axios.get('/api/partners');
+        setTeams(t.data?.teams || []);
+        const ann = await axios.get('/api/choose-chickens');
+        setAnnouncement(ann.data?.announcement || null);
+      } catch (_) {}
+    };
+    load();
+    const i = setInterval(load, 5000);
+    return () => clearInterval(i);
+  }, []);
   const playerStats = {
     gamesPlayed: Math.floor(Math.random() * 50) + 10,
     chickensFound: Math.floor(Math.random() * 20) + 5,
@@ -23,6 +42,26 @@ const Profile = ({ player, role, players }) => {
       height: '100%',
       overflowY: 'auto'
     }}>
+      {announcement && (
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          marginBottom: '1rem',
+          padding: '1rem',
+          background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+          border: '1px solid #fcd34d',
+          borderRadius: '12px',
+          boxShadow: 'var(--shadow-md)'
+        }}>
+          <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+            🐔 Announcement
+          </div>
+          <div style={{ color: 'var(--text-secondary)' }}>
+            {announcement.message}
+          </div>
+        </div>
+      )}
       {/* Profile Header */}
       <div style={{ 
         textAlign: 'center', 
@@ -216,12 +255,54 @@ const Profile = ({ player, role, players }) => {
           borderRadius: '12px',
           border: '1px solid #bae6fd'
         }}>
-          <div style={{ 
-            fontSize: '0.875rem', 
-            color: 'var(--text-secondary)',
-            textAlign: 'center'
+          {/* Partner select */}
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            if (!partnerId) return;
+            setSubmitting(true);
+            try {
+              await axios.post('/api/partners', { playerId: player.id, partnerId });
+              const t = await axios.get('/api/partners');
+              setTeams(t.data?.teams || []);
+            } catch (_) {}
+            setSubmitting(false);
           }}>
-            {players ? `${players.length} players online` : 'Loading team...'}
+            <div style={{ display: 'grid', gap: '0.5rem' }}>
+              <select
+                className="input"
+                value={partnerId}
+                onChange={(e) => setPartnerId(e.target.value)}
+              >
+                <option value="">Select your partner…</option>
+                {(players || []).filter(p => p.id !== player.id).map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <button className="btn" type="submit" disabled={!partnerId || submitting}>
+                {submitting ? 'Saving…' : '🤝 Choose Partner'}
+              </button>
+            </div>
+          </form>
+
+          {/* Teams list */}
+          <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+            <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Teams</div>
+            {teams.length === 0 ? (
+              <div>No confirmed teams yet</div>
+            ) : (
+              <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                {teams.map((pair, idx) => {
+                  const [aId, bId] = pair;
+                  const a = (players || []).find(p => p.id === aId);
+                  const b = (players || []).find(p => p.id === bId);
+                  return (
+                    <li key={idx}>
+                      {(a?.name || 'Player A')} & {(b?.name || 'Player B')}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         </div>
       </div>
